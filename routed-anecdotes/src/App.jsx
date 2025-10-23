@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { Routes, Route, useMatch } from 'react-router-dom'
 import About from './Components/About'
 import AnecdoteList from './Components/AnecdoteList'
+import Anecdote from './Components/Anecdote'
 import Menu from './Components/Menu'
 import CreateNew from './Components/CreateNew'
 import Footer from './Components/Footer'
-import { Routes, Route } from 'react-router-dom'
+
 
 const App = () => {
   const [anecdotes, setAnecdotes] = useState([
@@ -23,6 +25,12 @@ const App = () => {
       id: 2
     }
   ])
+
+
+    const match = useMatch('anecdotes/:id')
+    const anecdote = match
+    ? anecdotes.find(anecdote => anecdote.id === Number(match.params.id))
+    : null
 
   const [notification, setNotification] = useState('')
 
@@ -54,6 +62,7 @@ return (
       <Route path='/' element={<AnecdoteList anecdotes={anecdotes} />} />
       <Route path='/about' element={<About />} />
       <Route path='/create' element={<CreateNew addNew={addNew} />} />
+      <Route path='/anecdotes/:id' element={<Anecdote anecdote={anecdote} />} />
     </Routes>
     <Footer />
   </div>
