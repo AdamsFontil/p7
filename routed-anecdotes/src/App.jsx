@@ -1,14 +1,16 @@
 import { useState } from 'react'
-import { Routes, Route, useMatch } from 'react-router-dom'
+import { Routes, Route, useMatch, useNavigate } from 'react-router-dom'
 import About from './Components/About'
 import AnecdoteList from './Components/AnecdoteList'
 import Anecdote from './Components/Anecdote'
 import Menu from './Components/Menu'
 import CreateNew from './Components/CreateNew'
 import Footer from './Components/Footer'
+import Notification from './Components/Notification'
 
 
 const App = () => {
+  const navigate = useNavigate()
   const [anecdotes, setAnecdotes] = useState([
     {
       content: 'If it hurts, do it more often',
@@ -32,11 +34,18 @@ const App = () => {
     ? anecdotes.find(anecdote => anecdote.id === Number(match.params.id))
     : null
 
-  const [notification, setNotification] = useState('')
+  const [notification, setNotification] = useState('a new anecdote has been created!')
 
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000)
+    console.log('what is anecdote being received', anecdote);
     setAnecdotes(anecdotes.concat(anecdote))
+    navigate('/')
+    setNotification(`a new anecdote '${anecdote.content} created!`)
+    setTimeout(() => {
+      setNotification('')
+    },5000)
+
   }
 
   const anecdoteById = (id) =>
@@ -58,6 +67,7 @@ return (
   <div>
     <h1>Software anecdotes</h1>
     <Menu />
+    <Notification notification={notification} />
     <Routes>
       <Route path='/' element={<AnecdoteList anecdotes={anecdotes} />} />
       <Route path='/about' element={<About />} />
