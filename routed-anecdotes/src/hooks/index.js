@@ -1,27 +1,24 @@
-import { useState } from 'react'
-
+import { useState } from "react";
 
 export const useField = (name) => {
-  const [value, setValue] = useState('')
+  const [value, setValue] = useState("");
 
   const onChange = (event) => {
-    setValue(event.target.value)
-  }
+    setValue(event.target.value);
+  };
 
   const reset = () => {
-    setValue('')
-  }
+    setValue("");
+  };
 
   return {
     name,
     value,
     onChange,
-    reset
-  }
-}
+    reset,
+  };
+};
 
 // modules can have several named exports
 
-export const reset = ( {objectOfValues} ) => {
-
-}
+export const reset = ({ objectOfValues }) => {};
