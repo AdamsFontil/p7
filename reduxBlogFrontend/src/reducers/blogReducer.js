@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import blogService from "../services/blogs"
+import { setNotification } from "./notificationReducer";
 
 
 const blogSlice = createSlice({
@@ -11,11 +12,17 @@ const blogSlice = createSlice({
     },
     setBlogs(state, action) {
       return action.payload
-    }
+    },
+    updateBlogOnRedux(state, action) {
+      console.log('selected blog--unchanged', action.payload);
+      const blogToLike = action.payload
+      console.log('blogtoLike', blogToLike);
+      return state.map((blog) => (blog.id !== blogToLike.id ? blog : blogToLike))
+    },
   }
 })
 
-const { createBlog, setBlogs } = blogSlice.actions
+const { createBlog, setBlogs, updateBlogOnRedux } = blogSlice.actions
 
 export const initializeBlogs = () => {
   return async (dispatch) => {
@@ -30,11 +37,31 @@ export const appendBlog = (blogObject) => {
     const newBlog = await blogService.create(blogObject)
     dispatch(createBlog(newBlog))
   }
-
 }
 
+export const likeBlog = (blogObject) => {
+  return async (dispatch) => {
+    try {
+      const modifiedBlogObject = {
+        ...blogObject,
+        likes: blogObject.likes + 1,
+        user: blogObject.user.id,
+      }
+      const updatedBlog = await blogService.update(modifiedBlogObject.id, modifiedBlogObject)
+      dispatch(updateBlogOnRedux(updatedBlog))
+      dispatch(setNotification({
+        message: `You liked '${updatedBlog.title}'`,
+        messageType: 'info'
+      }, 3))
+    } catch (error) {
+      console.error('Error liking blog:', error)
+      dispatch(setNotification({
+        message: 'Failed to like blog',
+        messageType: 'error'
+      },5))
+    }
+  }
+}
 
-
-// export const { toggleImportanceOf } = noteSlice.actions
 
 export default blogSlice.reducer

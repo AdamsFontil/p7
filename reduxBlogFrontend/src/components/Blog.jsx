@@ -1,7 +1,10 @@
+import { likeBlog } from "../reducers/blogReducer";
+import { useDispatch } from "react-redux";
 import Togglable from "./Togglable";
 import { useState } from "react";
 
-const Blog = ({ blog, handleLike, user, handleRemove }) => {
+const Blog = ({ blog, user, handleRemove }) => {
+  const dispatch = useDispatch()
   const [visible, setVisible] = useState(false);
 
   const blogStyle = {
@@ -29,7 +32,7 @@ const Blog = ({ blog, handleLike, user, handleRemove }) => {
             <div>{blog.url}</div>
             <div>
               likes {blog.likes}{" "}
-              <button onClick={() => handleLike(blog)}>like</button>
+              <button onClick={() => dispatch(likeBlog(blog))}>like</button>
             </div>
             <div>{blog?.user?.name}</div>
             {canDelete && (

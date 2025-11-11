@@ -57,35 +57,6 @@ const App = () => {
     }
   };
 
-  const likeBlog = async (blogToUpdate) => {
-    const updatedBlog = {
-      ...blogToUpdate,
-      likes: blogToUpdate.likes + 1,
-      user: blogToUpdate.user?.id,
-    };
-
-    console.log(updatedBlog);
-
-    try {
-      const returnedBlog = await blogService.update(
-        blogToUpdate.id,
-        updatedBlog,
-      );
-
-      const updatedBlogs = blogs.map((blog) => {
-        return blog.id === returnedBlog.id ? returnedBlog : blog;
-      });
-
-      setBlogs(updatedBlogs);
-      console.log("what is updatedBlogs", updatedBlogs);
-      setNotification({ message: `You liked '${returnedBlog.title}'` });
-      setTimeout(() => setNotification(null), 5000);
-    } catch (error) {
-      console.error("Failed to like blog:", error);
-      setNotification({ message: "Failed to like blog", error: true });
-      setTimeout(() => setNotification(null), 5000);
-    }
-  };
 
   const handleRemove = async (blog) => {
     if (
@@ -111,7 +82,7 @@ const App = () => {
     window.localStorage.removeItem("loggedBlogUser");
     blogService.setToken(null);
     setUser(null);
-    console.log("logged out complete");
+    console.log("log out complete");
   };
 
   const addBlog = async (blogObject) => {
@@ -187,7 +158,6 @@ const App = () => {
           <Blog
             key={blog.id}
             blog={blog}
-            handleLike={likeBlog}
             user={user}
             handleRemove={handleRemove}
           />
