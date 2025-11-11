@@ -5,20 +5,20 @@ import loginService from "./services/login";
 import Togglable from "./components/Togglable";
 import CreateBlogForm from "./components/CreateBlogForm";
 import { useDispatch, useSelector } from "react-redux";
-import { removeNotification, setNotification } from "./reducers/notificationReducer";
+import { setNotification } from "./reducers/notificationReducer";
+import { appendBlog, initializeBlogs } from "./reducers/blogReducer";
 
 const App = () => {
   const dispatch = useDispatch()
+  const blogs = useSelector( state => state.blogs)
   const notification = useSelector( state => state.notification)
-  const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  // const [notification, setNotification] = useState(null);
-
+  console.log('blogs', blogs);
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
+    dispatch(initializeBlogs())
+  }, [dispatch]);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogUser");
@@ -57,7 +57,6 @@ const App = () => {
     }
   };
 
-  console.log('what is notification???', notification);
   const likeBlog = async (blogToUpdate) => {
     const updatedBlog = {
       ...blogToUpdate,
@@ -116,25 +115,24 @@ const App = () => {
   };
 
   const addBlog = async (blogObject) => {
-    console.log("blogObject received", blogObject);
     try {
-      const createdBlog = await blogService.create(blogObject);
-      setBlogs(blogs.concat(createdBlog));
-      console.log("Created blog: from the app", createdBlog);
-      setNotification({
-        message: `a new blog ${createdBlog.title} by ${createdBlog.author} added`,
-      });
+      dispatch(appendBlog(blogObject))
+      console.log('what is blogObject', blogObject);
+      dispatch(setNotification({
+        message: `a new blog ${blogObject.title} by ${blogObject.author} added`,
+      }));
       setTimeout(() => {
-        setNotification(null);
+        dispatch(setNotification(null));
       }, 5000);
     } catch (error) {
       console.error("Error creating blog:", error);
-      setNotification({ message: error, error: true });
+      setNotification({ message: error, messageType: 'error' });
       setTimeout(() => {
         setNotification(null);
       }, 5000);
     }
   };
+
   const notificationComp = () =>
   notification.messageType === 'error'
   ? <div className="error">{notification.message}</div>
@@ -183,7 +181,7 @@ const App = () => {
       <Togglable buttonLabelShow="create new blog" buttonLabelCancel="cancel">
         <CreateBlogForm createBlog={addBlog} />
       </Togglable>
-      {blogs
+      {[...blogs]
         .sort((a, b) => b.likes - a.likes)
         .map((blog) => (
           <Blog
