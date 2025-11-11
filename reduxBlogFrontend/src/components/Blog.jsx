@@ -1,4 +1,4 @@
-import { likeBlog } from "../reducers/blogReducer";
+import { likeBlog, removeBlog } from "../reducers/blogReducer";
 import { useDispatch } from "react-redux";
 import Togglable from "./Togglable";
 import { useState } from "react";
@@ -37,7 +37,7 @@ const Blog = ({ blog, user, handleRemove }) => {
             <div>{blog?.user?.name}</div>
             {canDelete && (
               <div>
-                <button onClick={() => handleRemove(blog)}>remove</button>
+                <button onClick={() => dispatch(removeBlog(blog))}>remove</button>
               </div>
             )}
           </div>

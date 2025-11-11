@@ -17,12 +17,16 @@ const blogSlice = createSlice({
       console.log('selected blog--unchanged', action.payload);
       const blogToLike = action.payload
       console.log('blogtoLike', blogToLike);
-      return state.map((blog) => (blog.id !== blogToLike.id ? blog : blogToLike))
+      // return state.map((blog) => (blog.id !== blogToLike.id ? blog : blogToLike))
     },
+    removeFromRedux(state, action) {
+      console.log('action.payload', action.payload);
+      return state.filter((blog) => blog.id !== action.payload.id)
+    }
   }
 })
 
-const { createBlog, setBlogs, updateBlogOnRedux } = blogSlice.actions
+const { createBlog, setBlogs, updateBlogOnRedux, removeFromRedux } = blogSlice.actions
 
 export const initializeBlogs = () => {
   return async (dispatch) => {
@@ -62,6 +66,33 @@ export const likeBlog = (blogObject) => {
     }
   }
 }
+
+export const removeBlog = (blog) => {
+  return async (dispatch) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to remove "${blog.title}" by ${blog.author}?`,
+      )
+    ) {
+      return;
+    }
+    try {
+      console.log('blog info', blog);
+      await blogService.remove(blog.id); //remove from backend
+      dispatch(removeFromRedux(blog)) // remove from frontend
+      dispatch(setNotification({
+        message: `removed ${blog.title} successfully`,
+        messageType: 'info'
+      },3))
+    } catch (error) {
+      console.error("Something went wrong", error);
+      dispatch(setNotification({
+        message: 'Failed to remove this blog',
+        messageType: 'error'
+      },5))
+    }
+  }
+  };
 
 
 export default blogSlice.reducer
