@@ -1,16 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import Togglable from "./components/Togglable";
 import CreateBlogForm from "./components/CreateBlogForm";
+import NotificationContext from "../notificationContext";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [notification, setNotification] = useState(null);
+
+  const { notification, notify } = useContext(NotificationContext)
+  console.log('what is notification', notification);
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -36,18 +39,12 @@ const App = () => {
       setUsername("");
       setPassword("");
       console.log("login success", user);
-      setNotification({ message: `Login succeeded ${user.username} is in` });
-      setTimeout(() => {
-        setNotification(null);
-      }, 5000);
+      notify(`Login succeeded ${user.username} is in`, 'info', 3000);
     } catch (error) {
       console.log("login failed", error);
       console.log("login failed", error.response.data.error);
       console.log("login failed", typeof error.response.data.error);
-      setNotification({ message: error.response.data.error, error: true });
-      setTimeout(() => {
-        setNotification(null);
-      }, 5000);
+      notify(error.response.data.error, 'error', 7000)
     }
   };
 
