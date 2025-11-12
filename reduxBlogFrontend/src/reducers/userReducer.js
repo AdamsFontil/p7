@@ -13,7 +13,7 @@ const userSlice = createSlice({
   }
 })
 
-export const { setUser } = userSlice.actions
+const { setUser } = userSlice.actions
 
 export const loginUser = (username, password) => {
   return async (dispatch) => {
@@ -41,7 +41,18 @@ export const logoutUser = () => {
     console.log("log out complete");
   }
 }
-// logout
-// initializeUser
+
+export const initializeUser = () => {
+  return async (dispatch) => {
+    console.log('testing use effect with thunk redux', );
+    const loggedUserJSON = window.localStorage.getItem("loggedBlogUser");
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON);
+      dispatch(setUser(user));
+      blogService.setToken(user.token);
+      console.log("log in saved---", user);
+    }
+  }
+}
 
 export default userSlice.reducer

@@ -7,7 +7,7 @@ import CreateBlogForm from "./components/CreateBlogForm";
 import { useDispatch, useSelector } from "react-redux";
 import { setNotification } from "./reducers/notificationReducer";
 import { appendBlog, initializeBlogs } from "./reducers/blogReducer";
-import { setUser, loginUser, logoutUser } from "./reducers/userReducer";
+import { loginUser, logoutUser, initializeUser } from "./reducers/userReducer";
 
 const App = () => {
   const dispatch = useDispatch()
@@ -24,26 +24,9 @@ const App = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    console.log('testing use effect', );
-    const loggedUserJSON = window.localStorage.getItem("loggedBlogUser");
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON);
-      dispatch(setUser(user));
-      blogService.setToken(user.token);
-      console.log("log in saved---", user);
-    }
-  }, []);
+    dispatch(initializeUser())
+  }, [dispatch]);
 
-
-
-  // const handleLogout = async (event) => {
-  //   console.log("logging out", user);
-  //   event.preventDefault();
-  //   window.localStorage.removeItem("loggedBlogUser");
-  //   blogService.setToken(null);
-  //   dispatch(setUser(null));
-  //   console.log("log out complete");
-  // };
 
   const addBlog = async (blogObject) => {
     try {
