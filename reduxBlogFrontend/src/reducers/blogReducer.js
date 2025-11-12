@@ -17,7 +17,7 @@ const blogSlice = createSlice({
       console.log('selected blog--unchanged', action.payload);
       const blogToLike = action.payload
       console.log('blogtoLike', blogToLike);
-      // return state.map((blog) => (blog.id !== blogToLike.id ? blog : blogToLike))
+      return state.map((blog) => (blog.id !== blogToLike.id ? blog : blogToLike))
     },
     removeFromRedux(state, action) {
       console.log('action.payload', action.payload);

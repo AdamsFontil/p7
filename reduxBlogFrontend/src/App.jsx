@@ -7,65 +7,43 @@ import CreateBlogForm from "./components/CreateBlogForm";
 import { useDispatch, useSelector } from "react-redux";
 import { setNotification } from "./reducers/notificationReducer";
 import { appendBlog, initializeBlogs } from "./reducers/blogReducer";
+import { setUser, loginUser, logoutUser } from "./reducers/userReducer";
 
 const App = () => {
   const dispatch = useDispatch()
   const blogs = useSelector( state => state.blogs)
   const notification = useSelector( state => state.notification)
-  const [user, setUser] = useState(null);
+  const user = useSelector( state => state.user)
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
   console.log('blogs', blogs);
+  console.log('user from reference', user);
   useEffect(() => {
     dispatch(initializeBlogs())
   }, [dispatch]);
 
   useEffect(() => {
+    console.log('testing use effect', );
     const loggedUserJSON = window.localStorage.getItem("loggedBlogUser");
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
-      setUser(user);
+      dispatch(setUser(user));
       blogService.setToken(user.token);
       console.log("log in saved---", user);
     }
   }, []);
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
-    try {
-      const user = await loginService.login({ username, password });
-      window.localStorage.setItem("loggedBlogUser", JSON.stringify(user));
-      blogService.setToken(user.token);
-      setUser(user);
-      setUsername("");
-      setPassword("");
-      console.log("login success", user);
-      dispatch(setNotification({ message: `Login succeeded ${user.username} is in`, messageType: 'info' }))
-
-      // setNotification({ message: `Login succeeded ${user.username} is in` });
-      setTimeout(() => {
-        dispatch(removeNotification());
-      }, 5000);
-    } catch (error) {
-      console.log("login failed", error);
-      console.log("login failed", error.response.data.error);
-      console.log("login failed", typeof error.response.data.error);
-      dispatch(setNotification({ message: error.response.data.error, messageType: 'error' }));
-      setTimeout(() => {
-        dispatch(removeNotification())
-      }, 5000);
-    }
-  };
 
 
-  const handleLogout = async (event) => {
-    console.log("logging out", user);
-    event.preventDefault();
-    window.localStorage.removeItem("loggedBlogUser");
-    blogService.setToken(null);
-    setUser(null);
-    console.log("log out complete");
-  };
+  // const handleLogout = async (event) => {
+  //   console.log("logging out", user);
+  //   event.preventDefault();
+  //   window.localStorage.removeItem("loggedBlogUser");
+  //   blogService.setToken(null);
+  //   dispatch(setUser(null));
+  //   console.log("log out complete");
+  // };
 
   const addBlog = async (blogObject) => {
     try {
@@ -74,15 +52,10 @@ const App = () => {
       dispatch(setNotification({
         message: `a new blog ${blogObject.title} by ${blogObject.author} added`,
       }));
-      setTimeout(() => {
-        dispatch(setNotification(null));
-      }, 5000);
+
     } catch (error) {
       console.error("Error creating blog:", error);
       setNotification({ message: error, messageType: 'error' });
-      setTimeout(() => {
-        setNotification(null);
-      }, 5000);
     }
   };
 
@@ -96,7 +69,12 @@ const App = () => {
       <div>
         <h2>Log in to application</h2>
         {notification && notificationComp()}
-        <form onSubmit={handleLogin}>
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          dispatch(loginUser(username, password));
+          setUsername('');
+          setPassword('');
+        }}>
           <div>
             <label>
               username
@@ -129,7 +107,7 @@ const App = () => {
       {notification && notificationComp()}
       <p>
         {" "}
-        {user.name} is logged in <button onClick={handleLogout}>logout</button>
+        {user.name} is logged in <button onClick={() => dispatch(logoutUser())}>logout</button>
       </p>
       <Togglable buttonLabelShow="create new blog" buttonLabelCancel="cancel">
         <CreateBlogForm createBlog={addBlog} />
