@@ -5,9 +5,11 @@ import loginService from "./services/login";
 import Togglable from "./components/Togglable";
 import CreateBlogForm from "./components/CreateBlogForm";
 import NotificationContext from "../notificationContext";
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
+
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
+  const queryClient = useQueryClient()
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -15,9 +17,7 @@ const App = () => {
   const { notification, notify } = useContext(NotificationContext)
   console.log('what is notification', notification);
 
-  useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
+
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogUser");
@@ -28,6 +28,23 @@ const App = () => {
       console.log("log in saved---", user);
     }
   }, []);
+
+
+  const result = useQuery({
+    queryKey: ['blogs'],
+    queryFn: blogService.getAll,
+    refetchOnWindowFocus: false
+  })
+
+
+  console.log(JSON.parse(JSON.stringify(result)))
+
+  if (result.isLoading) {
+    return <div>loading data...</div>
+  }
+
+  const blogs = result.data
+  console.log('blogs2', blogs);
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -105,26 +122,7 @@ const App = () => {
     console.log("logged out complete");
   };
 
-  const addBlog = async (blogObject) => {
-    console.log("blogObject received", blogObject);
-    try {
-      const createdBlog = await blogService.create(blogObject);
-      setBlogs(blogs.concat(createdBlog));
-      console.log("Created blog: from the app", createdBlog);
-      setNotification({
-        message: `a new blog ${createdBlog.title} by ${createdBlog.author} added`,
-      });
-      setTimeout(() => {
-        setNotification(null);
-      }, 5000);
-    } catch (error) {
-      console.error("Error creating blog:", error);
-      setNotification({ message: error, error: true });
-      setTimeout(() => {
-        setNotification(null);
-      }, 5000);
-    }
-  };
+
   const notificationComp = () =>
     notification.error ? (
       <div className="error">{notification.message}</div>
@@ -173,7 +171,7 @@ const App = () => {
         {user.name} is logged in <button onClick={handleLogout}>logout</button>
       </p>
       <Togglable buttonLabelShow="create new blog" buttonLabelCancel="cancel">
-        <CreateBlogForm createBlog={addBlog} />
+        <CreateBlogForm />
       </Togglable>
       {blogs
         .sort((a, b) => b.likes - a.likes)
