@@ -36,6 +36,48 @@ const App = () => {
     refetchOnWindowFocus: false
   })
 
+    const newBlogMutation = useMutation({
+    mutationFn: blogService.create,
+    onSuccess: (newBlog) => {
+      const blogs = queryClient.getQueryData(['blogs'])
+      queryClient.setQueryData(['blogs'], blogs.concat(newBlog))
+      notify(`successfully added "${newBlog.title}" to blogs`, 'info', 3000)
+    },
+    onError: (error) => {
+      notify(`Error: ${error}`, 'error', 5000)
+    }
+  })
+
+
+  const likeBlogMutation = useMutation({
+  mutationFn: ({ id, updatedBlog }) => blogService.update(id, updatedBlog),
+  onSuccess: (updatedBlog) => {
+    const blogs = queryClient.getQueryData(['blogs'])
+    const updatedBlogs = blogs.map((blog) => {
+      return blog.id === updatedBlog.id ? updatedBlog : blog;
+    });
+    queryClient.setQueryData(['blogs'], updatedBlogs);
+    notify(`Liked "${updatedBlog.title}"`, 'info', 3000)
+  },
+  onError: (error) => {
+  const message = error?.response?.data?.error || error.message || 'Failed to like blog';
+  notify(message, 'error', 5000)
+}
+})
+
+const removeBlogMutation = useMutation({
+  mutationFn: blogService.remove,
+  onSuccess: (blog) => {
+    queryClient.invalidateQueries({ queryKey: ['blogs']})
+  },
+  onError: (error) => {
+    console.error("Something went wrong", error);
+    const message = error?.response?.data?.error || error.message || 'Failed to like blog';
+    notify(message, 'error', 5000)
+  }
+
+})
+
 
   console.log(JSON.parse(JSON.stringify(result)))
 
@@ -65,35 +107,17 @@ const App = () => {
     }
   };
 
-  const likeBlog = async (blogToUpdate) => {
-    const updatedBlog = {
+  const likeBlog = (blogToUpdate) => {
+  likeBlogMutation.mutate({
+    id: blogToUpdate.id,
+    updatedBlog: {
       ...blogToUpdate,
       likes: blogToUpdate.likes + 1,
-      user: blogToUpdate.user?.id,
-    };
-
-    console.log(updatedBlog);
-
-    try {
-      const returnedBlog = await blogService.update(
-        blogToUpdate.id,
-        updatedBlog,
-      );
-
-      const updatedBlogs = blogs.map((blog) => {
-        return blog.id === returnedBlog.id ? returnedBlog : blog;
-      });
-
-      setBlogs(updatedBlogs);
-      console.log("what is updatedBlogs", updatedBlogs);
-      setNotification({ message: `You liked '${returnedBlog.title}'` });
-      setTimeout(() => setNotification(null), 5000);
-    } catch (error) {
-      console.error("Failed to like blog:", error);
-      setNotification({ message: "Failed to like blog", error: true });
-      setTimeout(() => setNotification(null), 5000);
+      user: blogToUpdate.user?.id
     }
-  };
+  })
+}
+
 
   const handleRemove = async (blog) => {
     if (
@@ -103,14 +127,7 @@ const App = () => {
     ) {
       return;
     }
-    try {
-      const removeBlog = await blogService.remove(blog.id);
-      console.log("Blog removed:", removeBlog);
-      const removeBlogFromUI = blogs.filter((b) => b.id !== blog.id);
-      setBlogs(removeBlogFromUI);
-    } catch (error) {
-      console.error("Something went wrong", error);
-    }
+   removeBlogMutation.mutate(blog.id)
   };
 
   const handleLogout = async (event) => {
@@ -122,6 +139,10 @@ const App = () => {
     console.log("logged out complete");
   };
 
+  const addBlog = async (blogObject) => {
+    console.log("blogObject received", blogObject);
+    newBlogMutation.mutate(blogObject)
+  };
 
   const notificationComp = () =>
     notification.error ? (
@@ -171,7 +192,7 @@ const App = () => {
         {user.name} is logged in <button onClick={handleLogout}>logout</button>
       </p>
       <Togglable buttonLabelShow="create new blog" buttonLabelCancel="cancel">
-        <CreateBlogForm />
+        <CreateBlogForm createBlog={addBlog} />
       </Togglable>
       {blogs
         .sort((a, b) => b.likes - a.likes)

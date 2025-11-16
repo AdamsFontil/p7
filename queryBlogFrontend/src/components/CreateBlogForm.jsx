@@ -24,6 +24,7 @@ const CreateBlogForm = () => {
   })
 
   const handleCreate = (event) => {
+
     event.preventDefault();
     console.log("creating new blog");
     console.log("values are", author, url, title);
