@@ -6,15 +6,17 @@ import Togglable from "./components/Togglable";
 import CreateBlogForm from "./components/CreateBlogForm";
 import NotificationContext from "../notificationContext";
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
+import UserContext from "../userContext";
 
 
 const App = () => {
   const queryClient = useQueryClient()
-  const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const { notification, notify } = useContext(NotificationContext)
+  const { user, userDispatch } = useContext(UserContext)
+  console.log('is this working', user);
   console.log('what is notification', notification);
 
 
@@ -23,7 +25,10 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogUser");
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
-      setUser(user);
+      userDispatch({
+      type: "SET_USER",
+      payload: user
+    });
       blogService.setToken(user.token);
       console.log("log in saved---", user);
     }
@@ -94,7 +99,10 @@ const removeBlogMutation = useMutation({
       const user = await loginService.login({ username, password });
       window.localStorage.setItem("loggedBlogUser", JSON.stringify(user));
       blogService.setToken(user.token);
-      setUser(user);
+      userDispatch({
+      type: "SET_USER",
+      payload: user
+    });
       setUsername("");
       setPassword("");
       console.log("login success", user);
@@ -135,7 +143,9 @@ const removeBlogMutation = useMutation({
     event.preventDefault();
     window.localStorage.removeItem("loggedBlogUser");
     blogService.setToken(null);
-    setUser(null);
+    userDispatch({
+      type: "REMOVE_USER",
+    });
     console.log("logged out complete");
   };
 
