@@ -1,23 +1,40 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { setNotification } from "../reducers/notificationReducer";
+import { appendBlog } from "../reducers/blogReducer";
 
-const CreateBlogForm = ({ createBlog }) => {
+const CreateBlogForm = () => {
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
+  const dispatch = useDispatch()
 
   const handleCreate = (event) => {
     event.preventDefault();
     console.log("creating new blog");
     console.log("values are", author, url, title);
+    console.log('app is not involved');
 
-    createBlog({
+    const blogObject = {
       title: title,
       author: author,
       url: url,
-    });
-    setAuthor("");
-    setUrl("");
-    setTitle("");
+    };
+
+    try {
+      dispatch(appendBlog(blogObject))
+      console.log('what is blogObject', blogObject);
+      dispatch(setNotification({
+        message: `a new blog ${blogObject.title} by ${blogObject.author} added`,
+      }));
+      setAuthor("");
+      setUrl("");
+      setTitle("");
+      }
+    catch (error) {
+      console.error("Error creating blog:", error);
+      setNotification({ message: error, messageType: 'error' });
+    }
   };
 
 

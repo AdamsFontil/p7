@@ -1,38 +1,16 @@
- const Notification = () =>
-  notification.messageType === 'error'
-  ? <div className="error">{notification.message}</div>
-  : <div className="note">{notification.message}</div>
+import { useSelector } from "react-redux";
 
-  if (user === null) {
-    return (
-      <div>
-        <h2>Log in to application</h2>
-        {notification && notificationComp()}
-        <form onSubmit={handleLogin}>
-          <div>
-            <label>
-              username
-              <input
-                type="text"
-                value={username}
-                onChange={({ target }) => setUsername(target.value)}
-              />
-            </label>
-          </div>
-          <div>
-            <label>
-              password
-              <input
-                type="text"
-                value={password}
-                onChange={({ target }) => setPassword(target.value)}
-              />
-            </label>
-          </div>
-          <button type="submit">login</button>
-        </form>
-      </div>
-    );
+const Notification = () => {
+  const notification = useSelector((state) => state.notification);
+
+  if (!notification || !notification.message) {
+    return null;
   }
 
-  export default Notification
+  const cssClass =
+    notification.messageType === "error" ? "error" : "info";
+
+  return <div className={cssClass}>{notification.message}</div>;
+};
+
+export default Notification;
