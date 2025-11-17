@@ -7,29 +7,23 @@ import LoginForm from "./components/defaultComps/LoginForm";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import Users from "./components/navComps/Users";
 import Home from "./components/navComps/Home";
+import User from "./components/navComps/User";
 
 const App = () => {
-  const dispatch = useDispatch()
-  // const blogs = useSelector( state => state.blogs)
-  const user = useSelector( state => state.user)
-
-  // console.log('blogs', blogs);
-  console.log('user from reference', user);
-  // useEffect(() => {
-  //   dispatch(initializeBlogs())
-  // }, [dispatch]);
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
   useEffect(() => {
-    dispatch(initializeUser())
+    dispatch(initializeUser());
   }, [dispatch]);
 
-
-
-  if (user === null) { return <LoginForm />}
+  if (user === null) {
+    return <LoginForm />;
+  }
 
   const padding = {
-    padding: 5
-  }
+    padding: 5,
+  };
 
   return (
     <Router>
@@ -37,12 +31,12 @@ const App = () => {
       <Notification />
       <p>
         {" "}
-        {user.name} is logged in <button onClick={() => dispatch(logoutUser())}>logout</button>
+        {user.name} is logged in{" "}
+        <button onClick={() => dispatch(logoutUser())}>logout</button>
       </p>
 
-
       <Routes>
-        {/* <Route path="/notes" element={<Notes />} /> */}
+        <Route path="/users/:id" element={<User />} />
         <Route path="/users" element={<Users />} />
         <Route path="/" element={<Home />} />
       </Routes>

@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getUsers } from "../../services/users";
+import { Link } from "react-router-dom";
 
 const Users = () => {
   const result = useQuery({
@@ -15,11 +16,6 @@ const Users = () => {
 
   const users = result.data;
   console.log("users are", users);
-  console.log("type users are", typeof users);
-
-  const usersArray = Object.values(users);
-  console.log("userArray", usersArray);
-  console.log("type of usersArray", typeof usersArray);
 
   return (
     <div>
@@ -35,7 +31,9 @@ const Users = () => {
         <tbody>
           {users.map((user) => (
             <tr key={user.id}>
-              <td>{user.name}</td>
+              <td>
+                <Link to={`/users/${user.id}`}>{user.name}</Link>
+              </td>
               <td>{user.blogs.length}</td>
             </tr>
           ))}
