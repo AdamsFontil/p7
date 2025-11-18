@@ -21,13 +21,14 @@ const User = () => {
     console.log("what is u", typeof u.id);
     return u.id === id;
   });
+
   if (!user) return <div>User not found</div>;
 
   console.log("who are users", users);
   console.log("id is what", id);
   console.log("found user", user);
   console.log("user blogs", user.blogs);
-  const userBlogs = user.blogs || [];
+  const userBlogs = user.blogs;
   return (
     <div>
       <h3>added blogs</h3>

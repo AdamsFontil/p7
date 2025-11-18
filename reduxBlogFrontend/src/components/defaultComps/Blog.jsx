@@ -1,12 +1,6 @@
-import { likeBlog, removeBlog } from "../../reducers/blogReducer";
-import { useDispatch } from "react-redux";
-import Togglable from "./Togglable";
-import { useState } from "react";
+import { Link } from "react-router-dom";
 
-const Blog = ({ blog, user, handleRemove }) => {
-  const dispatch = useDispatch()
-  const [visible, setVisible] = useState(false);
-
+const Blog = ({ blog }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -14,35 +8,12 @@ const Blog = ({ blog, user, handleRemove }) => {
     borderWidth: 1,
     marginBottom: 5,
   };
-  // console.log('blog info i need user as well', blog);
-  // console.log('who is user', user);
-  const canDelete = user?.username === blog?.user?.username;
-
+  console.log("what is blog??", blog);
   return (
     <div className="blog" style={blogStyle}>
-      <div>
-        <div className="blogInfoMin">
-          {blog.title} {blog.author}
-          <button onClick={() => setVisible(!visible)}>
-            {visible ? "hide" : "view"}
-          </button>
-        </div>
-        {visible && (
-          <div>
-            <div>{blog.url}</div>
-            <div>
-              likes {blog.likes}{" "}
-              <button onClick={() => dispatch(likeBlog(blog))}>like</button>
-            </div>
-            <div>{blog?.user?.name}</div>
-            {canDelete && (
-              <div>
-                <button onClick={() => dispatch(removeBlog(blog))}>remove</button>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      <Link to={`/blogs/${blog.id}`}>
+        {blog.title} {blog.author}
+      </Link>
     </div>
   );
 };

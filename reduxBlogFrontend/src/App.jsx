@@ -5,9 +5,10 @@ import { logoutUser, initializeUser } from "./reducers/userReducer";
 import Notification from "./components/defaultComps/Notification";
 import LoginForm from "./components/defaultComps/LoginForm";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
-import Users from "./components/navComps/Users";
-import Home from "./components/navComps/Home";
-import User from "./components/navComps/User";
+import Users from "./components/navComps/Userspage";
+import Home from "./components/navComps/Homepage";
+import User from "./components/navComps/Userpage";
+import Blog from "./components/navComps/Blogpage";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -15,6 +16,7 @@ const App = () => {
 
   useEffect(() => {
     dispatch(initializeUser());
+    dispatch(initializeBlogs());
   }, [dispatch]);
 
   if (user === null) {
@@ -37,6 +39,7 @@ const App = () => {
 
       <Routes>
         <Route path="/users/:id" element={<User />} />
+        <Route path="/blogs/:id" element={<Blog />} />
         <Route path="/users" element={<Users />} />
         <Route path="/" element={<Home />} />
       </Routes>
