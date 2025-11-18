@@ -25,6 +25,24 @@ const create = async (newObject) => {
   return response.data;
 };
 
+const createNewComment = async (id, comment) => {
+  console.log('id and comment received', id, comment);
+  const response = await fetch(`${baseUrl}/${id}/comments`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ comment })
+  })
+
+  if (!response.ok) {
+    throw new Error("Failed to add comment")
+  }
+  const data = await response.json()
+  console.log('did it work', data);
+  return data
+}
+
 const update = (id, newObject) => {
   console.log("what is newObject", newObject);
   const request = axios.put(`${baseUrl}/${id}`, newObject);
@@ -40,4 +58,4 @@ const remove = async (id) => {
   return response.data;
 };
 
-export default { getAll, setToken, create, update, remove };
+export default { getAll, setToken, create, update, remove, createNewComment };

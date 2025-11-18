@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 
 const Home = () => {
   const blogs = useSelector((state) => state.blogs);
-  const user = useSelector((state) => state.user);
 
   console.log("blogs from home", blogs);
   return (

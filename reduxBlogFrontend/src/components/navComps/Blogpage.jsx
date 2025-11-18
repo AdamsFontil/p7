@@ -1,4 +1,9 @@
-import { likeBlog, removeBlog } from "../../reducers/blogReducer";
+import { useState } from "react";
+import {
+  appendComment,
+  likeBlog,
+  removeBlog,
+} from "../../reducers/blogReducer";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -9,6 +14,7 @@ const Blogpage = () => {
   const dispatch = useDispatch();
   const blogs = useSelector((state) => state.blogs);
   const user = useSelector((state) => state.user);
+  const [newComment, setNewComment] = useState("");
 
   console.log("blogs received from redux", blogs);
 
@@ -20,6 +26,14 @@ const Blogpage = () => {
   const canDelete = user?.username === blog?.user?.username;
   const comments = blog?.comments;
   console.log("comments???", comments);
+  console.log("what are blogs from BLOGPAGE", blogs);
+
+  const handleAddComment = async () => {
+    const comment = newComment;
+    console.log("comment sent---", comment);
+    dispatch(appendComment(blog.id, newComment));
+    setNewComment("");
+  };
 
   return (
     <div>
@@ -40,6 +54,12 @@ const Blogpage = () => {
         </div>
         <div>
           <h4>comments</h4>
+          <input
+            type="text"
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+          />
+          <button onClick={handleAddComment}>add comment</button>
           <ul>
             {comments.map((comment, index) => (
               <li key={index}> {comment} </li>

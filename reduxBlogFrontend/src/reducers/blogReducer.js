@@ -22,11 +22,16 @@ const blogSlice = createSlice({
     removeFromRedux(state, action) {
       console.log('action.payload', action.payload);
       return state.filter((blog) => blog.id !== action.payload.id)
+    },
+    addCommentToRedux(state, action) {
+      console.log('what is action payload', action.payload);
+      const blogWithNewComment = action.payload
+      return state.map((blog) => (blog.id === blogWithNewComment.id ? blogWithNewComment : blog ))
     }
   }
 })
 
-const { createBlog, setBlogs, updateBlogOnRedux, removeFromRedux } = blogSlice.actions
+const { createBlog, setBlogs, updateBlogOnRedux, removeFromRedux, addCommentToRedux } = blogSlice.actions
 
 export const initializeBlogs = () => {
   return async (dispatch) => {
@@ -40,6 +45,13 @@ export const appendBlog = (blogObject) => {
   return async (dispatch) => {
     const newBlog = await blogService.create(blogObject)
     dispatch(createBlog(newBlog))
+  }
+}
+
+export const appendComment = (id, comment) => {
+  return async (dispatch) => {
+    const blogWithNewComment = await blogService.createNewComment(id, comment)
+    dispatch(addCommentToRedux(blogWithNewComment))
   }
 }
 
