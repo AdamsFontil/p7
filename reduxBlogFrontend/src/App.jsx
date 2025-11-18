@@ -29,13 +29,25 @@ const App = () => {
 
   return (
     <Router>
-      <h2>blogs</h2>
+      <div>
+        <Link style={padding} to="/">
+          blogs
+        </Link>
+        <Link style={padding} to="/users">
+          users
+        </Link>
+        {/* {user
+      ? <em>{user} logged in</em>
+      : <Link style={padding} to="/login">login</Link>
+    } */}
+        <span>
+          {" "}
+          {user.name} is logged in{" "}
+          <button onClick={() => dispatch(logoutUser())}>logout</button>
+        </span>
+      </div>
+      <h2>blog app </h2>
       <Notification />
-      <p>
-        {" "}
-        {user.name} is logged in{" "}
-        <button onClick={() => dispatch(logoutUser())}>logout</button>
-      </p>
 
       <Routes>
         <Route path="/users/:id" element={<User />} />
