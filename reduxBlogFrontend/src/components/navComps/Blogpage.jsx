@@ -18,6 +18,8 @@ const Blogpage = () => {
   console.log("blog info i need user as well", blog);
   console.log("who is user", user);
   const canDelete = user?.username === blog?.user?.username;
+  const comments = blog?.comments;
+  console.log("comments???", comments);
 
   return (
     <div>
@@ -35,6 +37,14 @@ const Blogpage = () => {
               <button onClick={() => dispatch(removeBlog(blog))}>remove</button>
             </div>
           )}
+        </div>
+        <div>
+          <h4>comments</h4>
+          <ul>
+            {comments.map((comment, index) => (
+              <li key={index}> {comment} </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>
