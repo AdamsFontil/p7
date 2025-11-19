@@ -9,6 +9,7 @@ import Users from "./components/navComps/Userspage";
 import Home from "./components/navComps/Homepage";
 import User from "./components/navComps/Userpage";
 import Blog from "./components/navComps/Blogpage";
+import Navbar from "./components/navComps/Navbar";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -23,30 +24,9 @@ const App = () => {
     return <LoginForm />;
   }
 
-  const padding = {
-    padding: 5,
-  };
-
   return (
     <Router>
-      <div>
-        <Link style={padding} to="/">
-          blogs
-        </Link>
-        <Link style={padding} to="/users">
-          users
-        </Link>
-        {/* {user
-      ? <em>{user} logged in</em>
-      : <Link style={padding} to="/login">login</Link>
-    } */}
-        <span>
-          {" "}
-          {user.name} is logged in{" "}
-          <button onClick={() => dispatch(logoutUser())}>logout</button>
-        </span>
-      </div>
-      <h2>blog app </h2>
+      <Navbar user={user} />
       <Notification />
 
       <Routes>

@@ -10,11 +10,11 @@ const Blog = ({ blog }) => {
   };
   console.log("what is blog??", blog);
   return (
-    <div className="blog" style={blogStyle}>
-      <Link to={`/blogs/${blog.id}`}>
+    <li style={blogStyle}>
+      <Link className="list-row p-4" to={`/blogs/${blog.id}`}>
         {blog.title} {blog.author}
       </Link>
-    </div>
+    </li>
   );
 };
 

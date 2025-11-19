@@ -4,68 +4,77 @@ import {
   likeBlog,
   removeBlog,
 } from "../../reducers/blogReducer";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
 const Blogpage = () => {
-  const id = useParams().id;
-
+  const { id } = useParams();
   const dispatch = useDispatch();
   const blogs = useSelector((state) => state.blogs);
   const user = useSelector((state) => state.user);
   const [newComment, setNewComment] = useState("");
 
-  console.log("blogs received from redux", blogs);
-
   const blog = blogs.find((b) => b.id === id);
   if (!blog) return <div>Loading blog...</div>;
 
-  console.log("blog info i need user as well", blog);
-  console.log("who is user", user);
   const canDelete = user?.username === blog?.user?.username;
-  const comments = blog?.comments;
-  console.log("comments???", comments);
-  console.log("what are blogs from BLOGPAGE", blogs);
+  const comments = blog?.comments || [];
 
-  const handleAddComment = async () => {
-    const comment = newComment;
-    console.log("comment sent---", comment);
+  const handleAddComment = () => {
+    if (newComment.trim() === "") return;
     dispatch(appendComment(blog.id, newComment));
     setNewComment("");
   };
 
   return (
-    <div>
-      <div>
-        <h2>{blog.title}</h2>
-        <div>
-          <div>{blog.url}</div>
-          <div>
-            likes {blog.likes}{" "}
-            <button onClick={() => dispatch(likeBlog(blog))}>like</button>
+    <div className="container mx-auto p-4">
+      {/* Blog Card */}
+      <div className="card bg-base-100 shadow-xl mb-6">
+        <div className="card-body">
+          <h2 className="card-title text-3xl">{blog.title}</h2>
+          <p className="text-blue-500 underline">{blog.url}</p>
+          <div className="flex items-center gap-4 mt-2">
+            <span className="badge badge-primary">Likes: {blog.likes}</span>
+            <button
+              className="btn btn-sm btn-outline btn-success"
+              onClick={() => dispatch(likeBlog(blog))}
+            >
+              Like
+            </button>
+            {canDelete && (
+              <button
+                className="btn btn-sm btn-outline btn-error"
+                onClick={() => dispatch(removeBlog(blog))}
+              >
+                Remove
+              </button>
+            )}
           </div>
-          <div>{blog?.user?.name}</div>
-          {canDelete && (
-            <div>
-              <button onClick={() => dispatch(removeBlog(blog))}>remove</button>
-            </div>
-          )}
+          <p className="mt-2 text-sm text-gray-500">By {blog?.user?.name}</p>
         </div>
-        <div>
-          <h4>comments</h4>
-          <input
-            type="text"
+      </div>
+
+      {/* Comments Section */}
+      <div className="card bg-base-200 shadow-md p-4">
+        <h3 className="text-xl font-semibold mb-2">Comments</h3>
+        <div className="flex gap-2 mb-4">
+          <textarea
+            className="textarea textarea-bordered w-full"
+            placeholder="Write a comment..."
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
           />
-          <button onClick={handleAddComment}>add comment</button>
-          <ul>
-            {comments.map((comment, index) => (
-              <li key={index}> {comment} </li>
-            ))}
-          </ul>
+          <button className="btn btn-primary" onClick={handleAddComment}>
+            Add
+          </button>
         </div>
+        <ul className="list-disc pl-5 space-y-2">
+          {comments.map((comment, index) => (
+            <li key={index} className="bg-base-100 p-2 rounded shadow-sm">
+              {comment}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

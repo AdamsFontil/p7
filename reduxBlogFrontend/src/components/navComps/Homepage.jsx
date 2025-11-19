@@ -8,15 +8,19 @@ const Home = () => {
 
   console.log("blogs from home", blogs);
   return (
-    <div>
+    <div className="bg-rd-800">
       <Togglable buttonLabelShow="create new blog" buttonLabelCancel="cancel">
         <CreateBlogForm />
       </Togglable>
-      {[...blogs]
-        .sort((a, b) => b.likes - a.likes)
-        .map((blog) => (
-          <Blog key={blog.id} blog={blog} />
-        ))}
+      <div className="p-4">
+        <ul class="list bg-base-100 shadow-md">
+          {[...blogs]
+            .sort((a, b) => b.likes - a.likes)
+            .map((blog) => (
+              <Blog key={blog.id} blog={blog} />
+            ))}
+        </ul>
+      </div>
     </div>
   );
 };
